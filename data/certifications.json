@@ -1,0 +1,26 @@
+{
+  "AZ-204": {
+    "skills": [
+      "Azure Functions",
+      "Storage",
+      "API Development"
+    ],
+    "recommended_hours": 20
+  },
+  "AZ-400": {
+    "skills": [
+      "CI/CD",
+      "GitHub Actions",
+      "Monitoring"
+    ],
+    "recommended_hours": 25
+  },
+  "DP-203": {
+    "skills": [
+      "Data Engineering",
+      "Spark",
+      "Azure Data Factory"
+    ],
+    "recommended_hours": 22
+  }
+}

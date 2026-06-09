@@ -1,0 +1,6 @@
+learner_id,role,certification,practice_score,hours_studied,exam_outcome,
+L-1001,Cloud Engineer,AZ-204,67,18,Fail,
+L-1002,DevOps Engineer,AZ-400,82,24,Pass,
+L-1003,Data Engineer,DP-203,74,20,Pass,
+L-1004,Cloud Engineer,AZ-204,55,10,Fail,
+L-1005,Security Engineer,AZ-500,88,30,Pass,
