@@ -142,3 +142,80 @@ Return markdown.
     )
 
     return response.choices[0].message.content
+
+def generate_assessment(
+    certification,
+    learning_path,
+    knowledge
+):
+
+    prompt = f"""
+You are a certification assessment agent.
+
+Certification:
+{certification}
+
+Learning Path:
+{learning_path}
+
+Knowledge:
+{knowledge}
+
+Generate:
+
+1. 5 MCQs
+2. 2 Scenario-based questions
+3. Answer Key
+4. Readiness Evaluation Criteria
+
+Return in markdown.
+"""
+
+    response = client.chat.completions.create(
+        model=AZURE_OPENAI_DEPLOYMENT_NAME,
+        messages=[
+            {
+                "role": "user",
+                "content": prompt
+            }
+        ]
+    )
+
+    return response.choices[0].message.content
+
+def generate_manager_insights(
+    profile,
+    study_plan
+):
+
+    prompt = f"""
+You are a workforce certification manager.
+
+Profile:
+{profile}
+
+Study Plan:
+{study_plan}
+
+Provide:
+
+1. Readiness Summary
+2. Risk Level
+3. Manager Actions
+4. Certification Success Probability
+5. Workforce Impact
+
+Return markdown.
+"""
+
+    response = client.chat.completions.create(
+        model=AZURE_OPENAI_DEPLOYMENT_NAME,
+        messages=[
+            {
+                "role": "user",
+                "content": prompt
+            }
+        ]
+    )
+
+    return response.choices[0].message.content
