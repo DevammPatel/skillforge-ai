@@ -22,3 +22,9 @@ print(result["learning_path"])
 print("\nSTUDY PLAN\n")
 
 print(result["study_plan"])
+
+print("\nASSESSMENT\n")
+print(result["assessment"])
+
+print("\nMANAGER INSIGHTS\n")
+print(result["manager_insights"])
