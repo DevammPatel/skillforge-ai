@@ -23,6 +23,7 @@ from agents.llm_client import (
     generate_learning_path
 )
 
+
 class SkillForgeWorkflow:
 
     def __init__(self):
@@ -55,6 +56,10 @@ class SkillForgeWorkflow:
         focus_hours
     ):
 
+        # --------------------------------------------------
+        # Agent 1: Learner Profile Agent
+        # --------------------------------------------------
+
         profile = self.profile_agent.analyze(
             role,
             certification,
@@ -65,6 +70,10 @@ class SkillForgeWorkflow:
         profile_analysis = (
             generate_reasoning(profile)
         )
+
+        # --------------------------------------------------
+        # Agent 2: Learning Curator Agent
+        # --------------------------------------------------
 
         knowledge = (
             self.curator_agent
@@ -79,6 +88,10 @@ class SkillForgeWorkflow:
             )
         )
 
+        # --------------------------------------------------
+        # Agent 3: Study Planner Agent
+        # --------------------------------------------------
+
         study_plan = (
             self.study_planner.create_plan(
                 role,
@@ -88,29 +101,110 @@ class SkillForgeWorkflow:
                 meeting_hours,
                 focus_hours
             )
-        )       
+        )
+
+        # --------------------------------------------------
+        # Agent 4: Assessment Agent
+        # --------------------------------------------------
 
         assessment = (
             self.assessment_agent
-                .create_assessment(
+            .create_assessment(
                 certification,
                 learning_path,
                 knowledge
             )
         )
 
+        # --------------------------------------------------
+        # Agent 5: Manager Insights Agent
+        # --------------------------------------------------
+
         manager_insights = (
             self.manager_agent.generate(
-            profile,
-            study_plan
+                profile,
+                study_plan
             )
         )
 
+        # --------------------------------------------------
+        # Execution Trace
+        # --------------------------------------------------
+
+        execution_trace = [
+
+            {
+                "agent": "Learner Profile Agent",
+                "status": "Completed",
+                "output": (
+                    f"Readiness Score: "
+                    f"{profile['readiness_score']}, "
+                    f"Risk: {profile['risk']}"
+                )
+            },
+
+            {
+                "agent": "Learning Curator Agent",
+                "status": "Completed",
+                "output": (
+                    "Generated personalized learning path"
+                )
+            },
+
+            {
+                "agent": "Study Planner Agent",
+                "status": "Completed",
+                "output": (
+                    "Generated adaptive study schedule"
+                )
+            },
+
+            {
+                "agent": "Assessment Agent",
+                "status": "Completed",
+                "output": (
+                    "Generated certification assessment"
+                )
+            },
+
+            {
+                "agent": "Manager Insights Agent",
+                "status": "Completed",
+                "output": (
+                    "Generated workforce recommendations"
+                )
+            }
+
+        ]
+
+        # --------------------------------------------------
+        # Final Workflow Output
+        # --------------------------------------------------
+
         return {
+
+            "input": {
+
+                "role": role,
+
+                "certification": certification,
+
+                "meeting_hours": meeting_hours,
+
+                "focus_hours": focus_hours
+            },
+
             "profile": profile,
+
             "analysis": profile_analysis,
+
             "learning_path": learning_path,
+
             "study_plan": study_plan,
+
             "assessment": assessment,
-            "manager_insights": manager_insights
+
+            "manager_insights": manager_insights,
+
+            "execution_trace": execution_trace
         }
