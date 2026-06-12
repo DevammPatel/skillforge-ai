@@ -20,6 +20,14 @@ project_root = os.path.abspath(
 sys.path.append(project_root)
 
 # --------------------------------------------------
+# Imports
+# --------------------------------------------------
+
+from agents.learner_profile_agent import (
+    LearnerProfileAgent
+)
+
+# --------------------------------------------------
 # Page Config
 # --------------------------------------------------
 
@@ -42,27 +50,20 @@ csv_path = os.path.join(
 raw_df = pd.read_csv(csv_path)
 
 # --------------------------------------------------
-# Build Dashboard Dataset
+# Generate Agent-Based Insights
 # --------------------------------------------------
+
+agent = LearnerProfileAgent()
 
 results = []
 
 for _, row in raw_df.iterrows():
 
-    readiness = max(
-        40,
-        min(
-            100,
-            int(row["practice_score"])
-        )
-    )
-
-    risk = (
-        "High"
-        if readiness < 60
-        else "Medium"
-        if readiness < 80
-        else "Low"
+    profile = agent.analyze_employee(
+        role=row["role"],
+        certification=row["certification"],
+        practice_score=row["practice_score"],
+        study_hours=row["hours_studied"]
     )
 
     results.append(
@@ -70,8 +71,9 @@ for _, row in raw_df.iterrows():
             "Employee": row["learner_id"],
             "Role": row["role"],
             "Certification": row["certification"],
-            "Readiness": readiness,
-            "Risk": risk,
+            "Readiness": profile["readiness_score"],
+            "Risk": profile["risk"],
+            "Recommended Hours": profile["recommended_hours"],
             "Study Hours": row["hours_studied"],
             "Exam Outcome": row["exam_outcome"]
         }
@@ -86,7 +88,11 @@ df = pd.DataFrame(results)
 st.title("📊 Manager Readiness Dashboard")
 
 st.markdown(
-    "Monitor certification readiness across the workforce and identify learners who require intervention."
+    """
+Monitor certification readiness across the workforce,
+identify risks early, and take proactive action using
+AI-generated workforce intelligence.
+"""
 )
 
 st.divider()
@@ -124,7 +130,7 @@ with col4:
 st.divider()
 
 # --------------------------------------------------
-# Charts
+# Charts Row
 # --------------------------------------------------
 
 left_col, right_col = st.columns(2)
@@ -136,7 +142,13 @@ with left_col:
         x="Employee",
         y="Readiness",
         color="Risk",
-        title="Employee Readiness Scores"
+        title="Employee Readiness Scores",
+        text="Readiness"
+    )
+
+    fig.update_layout(
+        xaxis_title="Employee",
+        yaxis_title="Readiness Score"
     )
 
     st.plotly_chart(
@@ -160,10 +172,31 @@ with right_col:
 st.divider()
 
 # --------------------------------------------------
+# Certification Breakdown
+# --------------------------------------------------
+
+st.subheader("📚 Certification Risk Distribution")
+
+fig3 = px.histogram(
+    df,
+    x="Certification",
+    color="Risk",
+    title="Certification Risk Breakdown",
+    barmode="group"
+)
+
+st.plotly_chart(
+    fig3,
+    use_container_width=True
+)
+
+st.divider()
+
+# --------------------------------------------------
 # Team Table
 # --------------------------------------------------
 
-st.subheader("👥 Team Readiness")
+st.subheader("👥 Team Readiness Overview")
 
 st.dataframe(
     df,
@@ -173,33 +206,55 @@ st.dataframe(
 st.divider()
 
 # --------------------------------------------------
-# AI Workforce Recommendations
+# AI Workforce Insights
 # --------------------------------------------------
+
+st.subheader("🤖 Agent Generated Workforce Insights")
 
 high_risk = df[df["Risk"] == "High"]
 
-st.subheader("🤖 AI Workforce Recommendations")
+avg_score = df["Readiness"].mean()
+
+if avg_score < 75:
+
+    st.warning(
+        "Average team readiness is below the target threshold."
+    )
+
+else:
+
+    st.success(
+        "Average team readiness is within acceptable limits."
+    )
+
+# --------------------------------------------------
+# High Risk Learners
+# --------------------------------------------------
 
 if len(high_risk) > 0:
 
-    st.warning(
-        f"{len(high_risk)} learner(s) require immediate attention."
+    st.error(
+        f"{len(high_risk)} high-risk learner(s) detected."
     )
-
-    st.markdown("### Immediate Actions")
-
-    st.markdown("""
-- Reduce meeting load for high-risk learners.
-- Schedule weekly certification check-ins.
-- Assign mentors to struggling candidates.
-- Increase protected study time.
-- Track readiness improvement weekly.
-""")
 
     st.markdown("### High-Risk Learners")
 
-    for learner in high_risk["Employee"]:
-        st.write(f"• {learner}")
+    st.dataframe(
+        high_risk,
+        use_container_width=True
+    )
+
+    st.markdown(
+        """
+### Recommended Manager Actions
+
+- Reduce meeting load for high-risk learners.
+- Allocate dedicated study time.
+- Assign certification mentors.
+- Schedule weekly readiness reviews.
+- Monitor progress through targeted assessments.
+"""
+    )
 
 else:
 
@@ -207,7 +262,11 @@ else:
         "No high-risk learners detected."
     )
 
-st.markdown("### Certification Forecast")
+# --------------------------------------------------
+# Certification Forecast
+# --------------------------------------------------
+
+st.markdown("### 📈 Certification Forecast")
 
 expected_pass_rate = (
     len(df[df["Readiness"] >= 60])
@@ -216,4 +275,23 @@ expected_pass_rate = (
 
 st.info(
     f"Estimated Certification Pass Rate: {expected_pass_rate:.0f}%"
+)
+
+# --------------------------------------------------
+# Executive Summary
+# --------------------------------------------------
+
+st.markdown("### 📋 Executive Summary")
+
+st.markdown(
+    f"""
+- Total Learners Evaluated: **{len(df)}**
+- Average Readiness: **{avg_score:.0f}%**
+- High Risk Learners: **{len(high_risk)}**
+- Estimated Pass Rate: **{expected_pass_rate:.0f}%**
+
+SkillForge AI recommends prioritizing interventions
+for high-risk learners while maintaining momentum
+for candidates already on track for certification.
+"""
 )
