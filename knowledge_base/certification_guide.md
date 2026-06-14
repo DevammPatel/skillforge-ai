@@ -19,6 +19,12 @@
 - Recommended Study Hours: 22 hours
 - Target Practice Score Before Exam: 76%
 
+## Security Engineer
+- Primary Certification: AZ-500 (Microsoft Azure Security Technologies)
+- Key Skills: Identity Protection, Microsoft Defender for Cloud, Azure Policy, Key Vault
+- Recommended Study Hours: 24 hours
+- Target Practice Score Before Exam: 78%
+
 ## Recommended Study Pattern (All Roles)
 - 1-2 hours of focused study daily
 - Weekly practice assessments
