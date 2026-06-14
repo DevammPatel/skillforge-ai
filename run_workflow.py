@@ -23,6 +23,9 @@ print("\nSTUDY PLAN\n")
 
 print(result["study_plan"])
 
+print("\nENGAGEMENT PLAN\n")
+print(result["engagement_plan"])
+
 print("\nASSESSMENT\n")
 print(result["assessment"])
 
