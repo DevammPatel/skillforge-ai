@@ -14,6 +14,10 @@ from agents.assessment_agent import (
     AssessmentAgent
 )
 
+from agents.engagement_agent import (
+    EngagementAgent
+)
+
 from agents.manager_insights_agent import (
     ManagerInsightsAgent
 )
@@ -42,6 +46,10 @@ class SkillForgeWorkflow:
 
         self.assessment_agent = (
             AssessmentAgent()
+        )
+
+        self.engagement_agent = (
+            EngagementAgent()
         )
 
         self.manager_agent = (
@@ -104,7 +112,19 @@ class SkillForgeWorkflow:
         )
 
         # --------------------------------------------------
-        # Agent 4: Assessment Agent
+        # Agent 4: Engagement Agent
+        # --------------------------------------------------
+
+        engagement_plan = (
+            self.engagement_agent.generate(
+                meeting_hours,
+                focus_hours,
+                profile["risk"]
+            )
+        )
+
+        # --------------------------------------------------
+        # Agent 5: Assessment Agent
         # --------------------------------------------------
 
         assessment = (
@@ -117,7 +137,7 @@ class SkillForgeWorkflow:
         )
 
         # --------------------------------------------------
-        # Agent 5: Manager Insights Agent
+        # Agent 6: Manager Insights Agent
         # --------------------------------------------------
 
         manager_insights = (
@@ -156,6 +176,14 @@ class SkillForgeWorkflow:
                 "status": "Completed",
                 "output": (
                     "Generated adaptive study schedule"
+                )
+            },
+
+            {
+                "agent": "Engagement Agent",
+                "status": "Completed",
+                "output": (
+                    "Generated workload-aware reminder strategy"
                 )
             },
 
@@ -201,6 +229,8 @@ class SkillForgeWorkflow:
             "learning_path": learning_path,
 
             "study_plan": study_plan,
+
+            "engagement_plan": engagement_plan,
 
             "assessment": assessment,
 
