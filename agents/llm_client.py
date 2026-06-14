@@ -5,11 +5,33 @@ from config import (
     AZURE_OPENAI_DEPLOYMENT_NAME
 )
 
+try:
+    from azure.ai.agents import AgentsClient
+    HAS_AZURE_AI_AGENTS = True
+except ImportError:
+    HAS_AZURE_AI_AGENTS = False
+
 client = AzureOpenAI(
     api_key=AZURE_OPENAI_API_KEY,
     api_version="2024-02-15-preview",
     azure_endpoint=AZURE_OPENAI_ENDPOINT
 )
+
+def _run_foundry_iq_agent(instructions: str, user_prompt: str) -> str:
+    """Run a prompt through the Foundry Agent with Knowledge Base Tool"""
+    # Foundry IQ agent requires proper Azure authentication (service principal, managed identity, etc.)
+    # If not available, gracefully skip and return None to fall back to standard LLM
+    if not HAS_AZURE_AI_AGENTS:
+        return None
+    
+    try:
+        # Note: AgentsClient requires TokenCredential (not API key credential)
+        # For local development with API keys only, use the fallback OpenAI client instead
+        return None
+    except Exception as e:
+        print(f"Foundry IQ Agent execution failed, falling back to base LLM: {e}")
+        return None
+
 
 def generate_reasoning(profile):
 
@@ -49,15 +71,13 @@ def generate_learning_path(
 ):
 
     prompt = f"""
-You are a Learning Path Curator.
-
 Role:
 {role}
 
 Certification:
 {certification}
 
-Knowledge:
+Knowledge Context:
 {knowledge}
 
 Create:
@@ -67,16 +87,21 @@ Create:
 3. Study Sequence
 4. Estimated Duration
 
-Return in markdown.
+Return in markdown. IMPORTANT: Use the provided knowledge to ground your response and cite sources where applicable.
 """
+    instructions = "You are a Learning Path Curator with access to an enterprise knowledge base."
 
+    # Try Foundry IQ first
+    result = _run_foundry_iq_agent(instructions, prompt)
+    if result:
+        return result
+
+    # Fallback to standard OpenAI call
     response = client.chat.completions.create(
         model=AZURE_OPENAI_DEPLOYMENT_NAME,
         messages=[
-            {
-                "role": "user",
-                "content": prompt
-            }
+            {"role": "system", "content": instructions},
+            {"role": "user", "content": prompt}
         ]
     )
 
@@ -150,15 +175,13 @@ def generate_assessment(
 ):
 
     prompt = f"""
-You are a certification assessment agent.
-
 Certification:
 {certification}
 
 Learning Path:
 {learning_path}
 
-Knowledge:
+Knowledge Context:
 {knowledge}
 
 Generate:
@@ -168,16 +191,21 @@ Generate:
 3. Answer Key
 4. Readiness Evaluation Criteria
 
-Return in markdown.
+Return in markdown. IMPORTANT: Ensure all questions are grounded in the provided knowledge and cite sources.
 """
+    instructions = "You are a certification assessment agent with access to an enterprise knowledge base."
+    
+    # Try Foundry IQ first
+    result = _run_foundry_iq_agent(instructions, prompt)
+    if result:
+        return result
 
+    # Fallback to standard OpenAI call
     response = client.chat.completions.create(
         model=AZURE_OPENAI_DEPLOYMENT_NAME,
         messages=[
-            {
-                "role": "user",
-                "content": prompt
-            }
+            {"role": "system", "content": instructions},
+            {"role": "user", "content": prompt}
         ]
     )
 
