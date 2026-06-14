@@ -22,5 +22,13 @@
       "Azure Data Factory"
     ],
     "recommended_hours": 22
+  },
+  "AZ-500": {
+    "skills": [
+      "Identity Protection",
+      "Security Operations",
+      "Azure Policy"
+    ],
+    "recommended_hours": 24
   }
 }

@@ -1,6 +1,6 @@
-employee_id,meeting_hours,focus_hours,preferred_learning_slot,,,
-EMP-001,22,10,Morning,,,
-EMP-002,15,18,Afternoon,,,
-EMP-003,12,20,Evening,,,
-EMP-004,25,8,Morning,,,
-EMP-005,10,22,Afternoon,,,
+employee_id,meeting_hours,focus_hours,preferred_learning_slot
+EMP-001,22,10,Morning
+EMP-002,15,18,Afternoon
+EMP-003,12,20,Evening
+EMP-004,25,8,Morning
+EMP-005,10,22,Afternoon
