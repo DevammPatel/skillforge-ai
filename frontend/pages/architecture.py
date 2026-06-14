@@ -1,4 +1,12 @@
 import streamlit as st
+from frontend.ui import (
+    apply_theme,
+    hero,
+    insight_cards,
+    section,
+    stat_grid,
+    workflow_timeline,
+)
 
 st.set_page_config(
     page_title="Architecture",
@@ -6,26 +14,30 @@ st.set_page_config(
     layout="wide"
 )
 
+apply_theme()
+
 # --------------------------------------------------
 # Header
 # --------------------------------------------------
 
-st.markdown("""
-# 🏗️ SkillForge AI Architecture
-
-### Enterprise Certification Intelligence Platform
-
-*Powered by Azure AI Foundry and Multi-Agent Reasoning*
-""")
-
-st.divider()
+hero(
+    "Azure AI Foundry architecture",
+    "SkillForge AI Architecture",
+    "A focused multi-agent system for certification planning, assessment, and workforce insight.",
+    pills=[
+        ("Agents", "6"),
+        ("Frontend", "Streamlit"),
+        ("Grounding", "knowledge base"),
+    ],
+)
 
 # --------------------------------------------------
 # Overview
 # --------------------------------------------------
 
+section("Solution Overview")
+
 st.markdown("""
-## 🎯 Solution Overview
 
 SkillForge AI is a multi-agent enterprise certification intelligence platform designed to help organizations improve workforce certification readiness.
 
@@ -34,13 +46,11 @@ The platform uses specialized AI agents to analyze learner readiness, curate lea
 Each agent performs a focused responsibility while a central orchestrator coordinates the workflow.
 """)
 
-st.divider()
-
 # --------------------------------------------------
 # High-Level Architecture
 # --------------------------------------------------
 
-st.header("🌐 System Architecture")
+section("System Architecture")
 
 st.code("""
                      ┌─────────────────────┐
@@ -87,13 +97,28 @@ st.code("""
 └────────────────┘  └────────────────┘
 """, language="text")
 
-st.divider()
-
 # --------------------------------------------------
 # Agent Layer
 # --------------------------------------------------
 
-st.header("🤖 Multi-Agent Layer")
+section("Multi-Agent Layer")
+
+insight_cards(
+    [
+        {
+            "title": "Separation of concerns",
+            "body": "Each agent owns one certification-intelligence task, keeping outputs focused and inspectable.",
+        },
+        {
+            "title": "Context passing",
+            "body": "The orchestrator passes profile, learning path, plan, and assessment context through the workflow.",
+        },
+        {
+            "title": "Dashboard delivery",
+            "body": "Outputs are shaped for both learner action and manager intervention.",
+        },
+    ]
+)
 
 col1, col2 = st.columns(2)
 
@@ -142,6 +167,20 @@ with col1:
 - Milestones
 """)
 
+    st.success("""
+### 🔔 Engagement Agent
+
+**Responsibility**
+- Adapt reminders to work rhythm
+- Respect focus windows
+- Define escalation thresholds
+
+**Output**
+- Reminder Cadence
+- Best Reminder Window
+- Privacy-Aware Follow-Up
+""")
+
 with col2:
 
     st.success("""
@@ -172,13 +211,11 @@ with col2:
 - Manager Actions
 """)
 
-st.divider()
-
 # --------------------------------------------------
 # Azure AI Foundry
 # --------------------------------------------------
 
-st.header("☁️ Azure AI Foundry Integration")
+section("Azure AI Foundry Integration")
 
 col1, col2, col3 = st.columns(3)
 
@@ -212,90 +249,85 @@ with col3:
 - Decision Support
 """)
 
-st.divider()
-
 # --------------------------------------------------
 # Data Flow
 # --------------------------------------------------
 
-st.header("🔄 Workflow Execution")
+section("Workflow Execution")
 
-st.markdown("""
-### Step 1
-Employee submits certification goal and workload details.
-
-⬇️
-
-### Step 2
-Learner Profile Agent evaluates readiness and identifies risks.
-
-⬇️
-
-### Step 3
-Learning Curator Agent generates a personalized learning path.
-
-⬇️
-
-### Step 4
-Study Planner Agent creates an adaptive certification schedule.
-
-⬇️
-
-### Step 5
-Assessment Agent generates readiness evaluations.
-
-⬇️
-
-### Step 6
-Manager Insights Agent produces workforce recommendations.
-
-⬇️
-
-### Step 7
-Results are presented through Employee and Manager Dashboards.
-""")
-
-st.divider()
+workflow_timeline(
+    [
+        (
+            "Employee input",
+            "The learner submits a certification goal and workload details.",
+        ),
+        (
+            "Readiness analysis",
+            "The Learner Profile Agent evaluates readiness and risk.",
+        ),
+        (
+            "Learning path",
+            "The Learning Curator Agent generates a grounded study sequence.",
+        ),
+        (
+            "Adaptive plan",
+            "The Study Planner Agent creates a workload-aware schedule.",
+        ),
+        (
+            "Assessment",
+            "The Assessment Agent generates readiness checks and criteria.",
+        ),
+        (
+            "Manager insight",
+            "The Manager Insights Agent produces workforce recommendations.",
+        ),
+        (
+            "Dashboard delivery",
+            "Results appear in learner, manager, trace, and analytics pages.",
+        ),
+    ]
+)
 
 # --------------------------------------------------
 # Project Highlights
 # --------------------------------------------------
 
-st.header("🏆 Why SkillForge AI?")
+section("Why SkillForge AI?")
 
-c1, c2, c3, c4 = st.columns(4)
-
-with c1:
-    st.metric(
-        "AI Agents",
-        "5"
-    )
-
-with c2:
-    st.metric(
-        "Dashboards",
-        "2"
-    )
-
-with c3:
-    st.metric(
-        "Azure Services",
-        "AI Foundry"
-    )
-
-with c4:
-    st.metric(
-        "Architecture",
-        "Multi-Agent"
-    )
-
-st.divider()
+stat_grid(
+    [
+        {
+            "label": "AI Agents",
+            "value": "6",
+            "caption": "Specialized reasoning roles",
+            "tone": "blue",
+        },
+        {
+            "label": "Dashboards",
+            "value": "4",
+            "caption": "Learner, manager, trace, and operations views",
+            "tone": "teal",
+        },
+        {
+            "label": "Azure Layer",
+            "value": "Foundry",
+            "caption": "Azure OpenAI-backed intelligence",
+            "tone": "amber",
+        },
+        {
+            "label": "Pattern",
+            "value": "Multi-agent",
+            "caption": "Coordinated orchestration",
+            "tone": "green",
+        },
+    ]
+)
 
 # --------------------------------------------------
 # Business Impact
 # --------------------------------------------------
 
-st.header("📈 Business Impact")
+section("Business Impact")
 
 st.markdown("""
 ### For Employees

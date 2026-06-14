@@ -1,5 +1,13 @@
 import streamlit as st
 from orchestrator.demo_trace import generate_trace
+from frontend.ui import (
+    apply_theme,
+    hero,
+    readiness_bar,
+    section,
+    stat_grid,
+    workflow_timeline,
+)
 
 st.set_page_config(
     page_title="Execution Trace",
@@ -7,75 +15,88 @@ st.set_page_config(
     layout="wide"
 )
 
+apply_theme()
+
 result = generate_trace()
 
-st.title("⚡ Live Multi-Agent Execution Trace")
-
-st.markdown("""
-This page demonstrates how SkillForge AI orchestrates
-multiple specialized AI agents to generate certification intelligence.
-""")
-
-st.divider()
+hero(
+    "Traceability",
+    "Live Multi-Agent Execution Trace",
+    "Inspect each agent handoff from learner input through final workforce insight.",
+    pills=[
+        ("Run mode", "demo trace"),
+        ("Agents", "6"),
+        ("Status", "complete"),
+    ],
+)
 
 # =====================================================
 # INPUT
 # =====================================================
 
-st.header("🎯 Input")
+section("Input")
 
 input_data = result["input"]
 
-c1, c2, c3, c4 = st.columns(4)
-
-with c1:
-    st.metric("Role", input_data["role"])
-
-with c2:
-    st.metric(
-        "Certification",
-        input_data["certification"]
-    )
-
-with c3:
-    st.metric(
-        "Meeting Hours",
-        input_data["meeting_hours"]
-    )
-
-with c4:
-    st.metric(
-        "Focus Hours",
-        input_data["focus_hours"]
-    )
-
-st.divider()
+stat_grid(
+    [
+        {
+            "label": "Role",
+            "value": input_data["role"],
+            "caption": "Learner persona",
+            "tone": "blue",
+        },
+        {
+            "label": "Certification",
+            "value": input_data["certification"],
+            "caption": "Target credential",
+            "tone": "teal",
+        },
+        {
+            "label": "Meetings",
+            "value": input_data["meeting_hours"],
+            "caption": "Weekly meeting hours",
+            "tone": "amber",
+        },
+        {
+            "label": "Focus",
+            "value": input_data["focus_hours"],
+            "caption": "Weekly focus hours",
+            "tone": "green",
+        },
+    ]
+)
 
 # =====================================================
 # AGENT 1
 # =====================================================
 
-st.subheader("👤 Agent 1 — Learner Profile Agent")
+section("Agent 1 - Learner Profile Agent")
 
-col1, col2, col3 = st.columns(3)
+stat_grid(
+    [
+        {
+            "label": "Readiness",
+            "value": f"{result['profile']['readiness_score']}%",
+            "caption": "Profile-derived readiness signal",
+            "tone": "teal",
+        },
+        {
+            "label": "Risk",
+            "value": result["profile"]["risk"],
+            "caption": "Intervention priority for the learner",
+            "tone": "amber",
+        },
+        {
+            "label": "Hours",
+            "value": result["profile"]["recommended_hours"],
+            "caption": "Recommended weekly study effort",
+            "tone": "blue",
+        },
+    ]
+)
 
-with col1:
-    st.metric(
-        "Readiness Score",
-        result["profile"]["readiness_score"]
-    )
-
-with col2:
-    st.metric(
-        "Risk",
-        result["profile"]["risk"]
-    )
-
-with col3:
-    st.metric(
-        "Recommended Hours",
-        result["profile"]["recommended_hours"]
-    )
+readiness_bar(result["profile"]["readiness_score"], "Learner readiness")
 
 with st.expander(
     "View Detailed Analysis",
@@ -83,13 +104,13 @@ with st.expander(
 ):
     st.markdown(result["analysis"])
 
-st.markdown("⬇️")
+st.markdown('<div class="sf-flow">↓</div>', unsafe_allow_html=True)
 
 # =====================================================
 # AGENT 2
 # =====================================================
 
-st.subheader("📚 Agent 2 — Learning Curator Agent")
+section("Agent 2 - Learning Curator Agent")
 
 with st.expander(
     "Generated Learning Path"
@@ -98,13 +119,13 @@ with st.expander(
         result["learning_path"]
     )
 
-st.markdown("⬇️")
+st.markdown('<div class="sf-flow">↓</div>', unsafe_allow_html=True)
 
 # =====================================================
 # AGENT 3
 # =====================================================
 
-st.subheader("📅 Agent 3 — Study Planner Agent")
+section("Agent 3 - Study Planner Agent")
 
 with st.expander(
     "Generated Study Plan"
@@ -113,13 +134,28 @@ with st.expander(
         result["study_plan"]
     )
 
-st.markdown("⬇️")
+st.markdown('<div class="sf-flow">↓</div>', unsafe_allow_html=True)
 
 # =====================================================
 # AGENT 4
 # =====================================================
 
-st.subheader("📝 Agent 4 — Assessment Agent")
+section("Agent 4 - Engagement Agent")
+
+with st.expander(
+    "Generated Engagement Plan"
+):
+    st.markdown(
+        result["engagement_plan"]
+    )
+
+st.markdown('<div class="sf-flow">↓</div>', unsafe_allow_html=True)
+
+# =====================================================
+# AGENT 5
+# =====================================================
+
+section("Agent 5 - Assessment Agent")
 
 with st.expander(
     "Generated Assessment"
@@ -128,13 +164,13 @@ with st.expander(
         result["assessment"]
     )
 
-st.markdown("⬇️")
+st.markdown('<div class="sf-flow">↓</div>', unsafe_allow_html=True)
 
 # =====================================================
-# AGENT 5
+# AGENT 6
 # =====================================================
 
-st.subheader("📊 Agent 5 — Manager Insights Agent")
+section("Agent 6 - Manager Insights Agent")
 
 with st.expander(
     "Generated Manager Recommendations",
@@ -144,13 +180,11 @@ with st.expander(
         result["manager_insights"]
     )
 
-st.divider()
-
 # =====================================================
 # EXECUTION SUMMARY
 # =====================================================
 
-st.header("🤖 Agent Collaboration Summary")
+section("Agent Collaboration Summary")
 
 for step in result["execution_trace"]:
 
@@ -158,17 +192,22 @@ for step in result["execution_trace"]:
         f"{step['agent']} → {step['output']}"
     )
 
-st.divider()
+workflow_timeline(
+    [
+        (step["agent"], step["output"])
+        for step in result["execution_trace"]
+    ]
+)
 
 # =====================================================
 # FINAL OUTCOME
 # =====================================================
 
-st.header("🏁 Final Outcome")
+section("Final Outcome")
 
 st.success("""
-SkillForge AI successfully coordinated 5 specialized agents
+SkillForge AI successfully coordinated 6 specialized agents
 to analyze learner readiness, generate a personalized learning
-path, build an adaptive study schedule, assess certification
-preparedness, and produce manager-level workforce insights.
+path, build an adaptive study schedule, define engagement timing,
+assess certification preparedness, and produce manager-level workforce insights.
 """)

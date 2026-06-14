@@ -11,6 +11,18 @@ import streamlit as st
 import plotly.graph_objects as go
 
 from orchestrator.workflow import SkillForgeWorkflow
+from frontend.ui import (
+    agent_list,
+    apply_theme,
+    callout,
+    configure_chart,
+    hero,
+    insight_cards,
+    readiness_bar,
+    section,
+    sidebar_brand,
+    stat_grid,
+)
 
 
 # --------------------------------------------------
@@ -23,19 +35,25 @@ st.set_page_config(
     layout="wide"
 )
 
+apply_theme()
+
 # --------------------------------------------------
 # Header
 # --------------------------------------------------
 
-st.markdown("""
-# 🚀 SkillForge AI
-
-### Enterprise Certification Intelligence Platform
-
-*Powered by Azure AI Foundry Multi-Agent Architecture*
-""")
-
-st.divider()
+hero(
+    "Azure AI Foundry multi-agent platform",
+    "SkillForge AI",
+    (
+        "Turn certification goals, workload constraints, and knowledge sources "
+        "into personalized study plans, assessments, and manager-ready insights."
+    ),
+    pills=[
+        ("Planner", "adaptive"),
+        ("Assessment", "generated"),
+        ("Insights", "manager-ready"),
+    ],
+)
 
 # --------------------------------------------------
 # Sidebar
@@ -43,14 +61,17 @@ st.divider()
 
 with st.sidebar:
 
-    st.header("Learner Details")
+    sidebar_brand()
+
+    st.header("Learner Profile")
 
     role = st.selectbox(
         "Role",
         [
             "Cloud Engineer",
             "DevOps Engineer",
-            "Data Engineer"
+            "Data Engineer",
+            "Security Engineer"
         ]
     )
 
@@ -59,7 +80,8 @@ with st.sidebar:
         [
             "AZ-204",
             "AZ-400",
-            "DP-203"
+            "DP-203",
+            "AZ-500"
         ]
     )
 
@@ -79,24 +101,23 @@ with st.sidebar:
 
     run_button = st.button(
         "Generate Plan",
-        use_container_width=True
+        width="stretch"
     )
 
     st.divider()
 
-    st.subheader("🤖 Multi-Agent Workflow")
+    st.subheader("Agent Workflow")
 
-    st.markdown("""
-✅ Learner Profile Agent
-
-✅ Learning Curator Agent
-
-✅ Study Planner Agent
-
-✅ Assessment Agent
-
-✅ Manager Insights Agent
-""")
+    agent_list(
+        [
+            ("Learner Profile Agent", "Readiness and risk analysis"),
+            ("Learning Curator Agent", "Knowledge-grounded pathing"),
+            ("Study Planner Agent", "Workload-aware scheduling"),
+            ("Engagement Agent", "Work-rhythm reminders"),
+            ("Assessment Agent", "Practice questions and criteria"),
+            ("Manager Insights Agent", "Workforce recommendations"),
+        ]
+    )
 
 # --------------------------------------------------
 # Run Workflow
@@ -121,42 +142,47 @@ if run_button:
     # KPI Row
     # ----------------------------------------------
 
-    col1, col2, col3 = st.columns(3)
+    section(
+        "Certification Snapshot",
+        f"{role} pursuing {certification}"
+    )
 
-    with col1:
-        st.metric(
-            "Readiness Score",
-            result["profile"]["readiness_score"]
-        )
+    risk = result["profile"]["risk"]
+    score = result["profile"]["readiness_score"]
 
-    with col2:
+    stat_grid(
+        [
+            {
+                "label": "Readiness Score",
+                "value": f"{score}%",
+                "caption": "Current certification preparedness",
+                "tone": "teal",
+            },
+            {
+                "label": "Risk Level",
+                "value": risk,
+                "caption": "Based on workload and study capacity",
+                "tone": "rose" if risk == "High" else "amber" if risk == "Medium" else "green",
+            },
+            {
+                "label": "Recommended Hours",
+                "value": result["profile"]["recommended_hours"],
+                "caption": "Suggested weekly learning investment",
+                "tone": "blue",
+            },
+        ]
+    )
 
-        risk = result["profile"]["risk"]
-
-        emoji = {
-            "Low": "🟢",
-            "Medium": "🟡",
-            "High": "🔴"
-        }
-
-        st.metric(
-            "Risk Level",
-            f"{emoji.get(risk, '')} {risk}"
-        )
-
-    with col3:
-        st.metric(
-            "Recommended Hours",
-            result["profile"]["recommended_hours"]
-        )
-
-    st.divider()
+    readiness_bar(score)
 
     # ----------------------------------------------
     # Gauge Chart
     # ----------------------------------------------
 
-    score = result["profile"]["readiness_score"]
+    section(
+        "Readiness Signal",
+        "Score combines workload, focus capacity, and certification context"
+    )
 
     fig = go.Figure(
         go.Indicator(
@@ -167,41 +193,50 @@ if run_button:
             },
             gauge={
                 "axis": {
-                    "range": [0, 100]
+                    "range": [0, 100],
+                    "tickwidth": 1,
+                    "tickcolor": "#64748b",
                 },
+                "bar": {"color": "#2563eb"},
+                "bgcolor": "white",
+                "borderwidth": 1,
+                "bordercolor": "#dbe3ef",
                 "steps": [
-                    {"range": [0, 50]},
-                    {"range": [50, 80]},
-                    {"range": [80, 100]}
-                ]
+                    {"range": [0, 50], "color": "#fee2e2"},
+                    {"range": [50, 80], "color": "#fef3c7"},
+                    {"range": [80, 100], "color": "#dcfce7"},
+                ],
+                "threshold": {
+                    "line": {"color": "#0f766e", "width": 4},
+                    "thickness": 0.78,
+                    "value": 80,
+                },
             }
         )
     )
 
+    fig = configure_chart(fig, height=340)
+
     st.plotly_chart(
         fig,
-        use_container_width=True
+        width="stretch"
     )
-
-    st.divider()
 
     # ----------------------------------------------
     # Main Content Layout
     # ----------------------------------------------
 
-    st.subheader("📚 Learning Path")
+    section("Learning Path", "Knowledge-grounded skills and sequencing")
 
     st.markdown(
         result["learning_path"]
     )
 
-    st.divider()
-
     col_left, col_right = st.columns(2)
 
     with col_left:
 
-        st.subheader("📅 Study Plan")
+        section("Study Plan")
 
         st.markdown(
             result["study_plan"]
@@ -209,16 +244,47 @@ if run_button:
 
     with col_right:
 
-        st.subheader("📝 Assessment")
+        section("Engagement")
 
         st.markdown(
-            result["assessment"]
+            result["engagement_plan"]
         )
 
-    st.divider()
+    section("Assessment", "Grounded practice questions and readiness criteria")
 
-    st.subheader("📊 Manager Insights")
+    st.markdown(
+        result["assessment"]
+    )
+
+    section("Manager Insights", "Recommended interventions and success signals")
 
     st.markdown(
         result["manager_insights"]
+    )
+else:
+    section("Launch A Plan", "Choose a learner profile in the sidebar")
+
+    callout(
+        "Ready when you are",
+        (
+            "Pick a role, certification, meeting load, and focus capacity. "
+            "SkillForge will coordinate the agent workflow and return a full readiness plan."
+        ),
+    )
+
+    insight_cards(
+        [
+            {
+                "title": "Profile first",
+                "body": "The learner profile agent turns workload and focus capacity into a readiness signal.",
+            },
+            {
+                "title": "Plan with constraints",
+                "body": "The study planner adapts learning time around meetings and available focus hours.",
+            },
+            {
+                "title": "Manager-ready output",
+                "body": "The final response includes interventions, assessment content, and workforce guidance.",
+            },
+        ]
     )

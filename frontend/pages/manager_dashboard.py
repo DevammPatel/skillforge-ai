@@ -26,6 +26,15 @@ sys.path.append(project_root)
 from agents.learner_profile_agent import (
     LearnerProfileAgent
 )
+from frontend.ui import (
+    apply_theme,
+    configure_chart,
+    hero,
+    insight_cards,
+    readiness_bar,
+    section,
+    stat_grid,
+)
 
 # --------------------------------------------------
 # Page Config
@@ -36,6 +45,8 @@ st.set_page_config(
     page_icon="📊",
     layout="wide"
 )
+
+apply_theme()
 
 # --------------------------------------------------
 # Load Learner Data
@@ -85,53 +96,65 @@ df = pd.DataFrame(results)
 # Header
 # --------------------------------------------------
 
-st.title("📊 Manager Readiness Dashboard")
-
-st.markdown(
-    """
-Monitor certification readiness across the workforce,
-identify risks early, and take proactive action using
-AI-generated workforce intelligence.
-"""
+hero(
+    "Workforce certification intelligence",
+    "Manager Readiness Dashboard",
+    (
+        "Monitor readiness, risk, study effort, and forecasted pass rates "
+        "across the certification pipeline."
+    ),
+    pills=[
+        ("Learners", len(df)),
+        ("Avg readiness", f"{df['Readiness'].mean():.0f}%"),
+        ("High risk", len(df[df["Risk"] == "High"])),
+    ],
 )
-
-st.divider()
 
 # --------------------------------------------------
 # KPI Cards
 # --------------------------------------------------
 
-col1, col2, col3, col4 = st.columns(4)
+section("Team Snapshot", "Generated from learner profiles and readiness analysis")
 
-with col1:
-    st.metric(
-        "Average Readiness",
-        f"{df['Readiness'].mean():.0f}%"
-    )
+avg_score = df["Readiness"].mean()
+high_risk = df[df["Risk"] == "High"]
 
-with col2:
-    st.metric(
-        "High Risk Learners",
-        len(df[df["Risk"] == "High"])
-    )
+stat_grid(
+    [
+        {
+            "label": "Average Readiness",
+            "value": f"{avg_score:.0f}%",
+            "caption": "Across active certification candidates",
+            "tone": "teal",
+        },
+        {
+            "label": "High Risk Learners",
+            "value": len(high_risk),
+            "caption": "Require intervention this sprint",
+            "tone": "rose" if len(high_risk) else "green",
+        },
+        {
+            "label": "Candidates",
+            "value": len(df),
+            "caption": "Learners in this readiness cohort",
+            "tone": "blue",
+        },
+        {
+            "label": "Avg Study Hours",
+            "value": f"{df['Study Hours'].mean():.0f}",
+            "caption": "Reported preparation hours",
+            "tone": "amber",
+        },
+    ]
+)
 
-with col3:
-    st.metric(
-        "Certification Candidates",
-        len(df)
-    )
-
-with col4:
-    st.metric(
-        "Average Study Hours",
-        f"{df['Study Hours'].mean():.0f}"
-    )
-
-st.divider()
+readiness_bar(avg_score, "Team readiness")
 
 # --------------------------------------------------
 # Charts Row
 # --------------------------------------------------
+
+section("Readiness And Risk", "Compare individuals and overall exposure")
 
 left_col, right_col = st.columns(2)
 
@@ -143,17 +166,24 @@ with left_col:
         y="Readiness",
         color="Risk",
         title="Employee Readiness Scores",
-        text="Readiness"
+        text="Readiness",
+        color_discrete_map={
+            "Low": "#16a34a",
+            "Medium": "#d97706",
+            "High": "#e11d48",
+        },
     )
 
     fig.update_layout(
         xaxis_title="Employee",
         yaxis_title="Readiness Score"
     )
+    fig.update_traces(texttemplate="%{text}%", textposition="outside")
+    fig.update_yaxes(range=[0, 105])
 
     st.plotly_chart(
-        fig,
-        use_container_width=True
+        configure_chart(fig, height=390),
+        width="stretch"
     )
 
 with right_col:
@@ -161,59 +191,61 @@ with right_col:
     fig2 = px.pie(
         df,
         names="Risk",
-        title="Risk Distribution"
+        title="Risk Distribution",
+        hole=0.54,
+        color="Risk",
+        color_discrete_map={
+            "Low": "#16a34a",
+            "Medium": "#d97706",
+            "High": "#e11d48",
+        },
     )
 
     st.plotly_chart(
-        fig2,
-        use_container_width=True
+        configure_chart(fig2, height=390),
+        width="stretch"
     )
-
-st.divider()
 
 # --------------------------------------------------
 # Certification Breakdown
 # --------------------------------------------------
 
-st.subheader("📚 Certification Risk Distribution")
+section("Certification Breakdown", "Risk grouped by target credential")
 
 fig3 = px.histogram(
     df,
     x="Certification",
     color="Risk",
     title="Certification Risk Breakdown",
-    barmode="group"
+    barmode="group",
+    color_discrete_map={
+        "Low": "#16a34a",
+        "Medium": "#d97706",
+        "High": "#e11d48",
+    },
 )
 
 st.plotly_chart(
-    fig3,
-    use_container_width=True
+    configure_chart(fig3, height=360),
+    width="stretch"
 )
-
-st.divider()
 
 # --------------------------------------------------
 # Team Table
 # --------------------------------------------------
 
-st.subheader("👥 Team Readiness Overview")
+section("Team Readiness Overview")
 
 st.dataframe(
     df,
-    use_container_width=True
+    width="stretch"
 )
-
-st.divider()
 
 # --------------------------------------------------
 # AI Workforce Insights
 # --------------------------------------------------
 
-st.subheader("🤖 Agent Generated Workforce Insights")
-
-high_risk = df[df["Risk"] == "High"]
-
-avg_score = df["Readiness"].mean()
+section("Agent Generated Workforce Insights")
 
 if avg_score < 75:
 
@@ -237,23 +269,32 @@ if len(high_risk) > 0:
         f"{len(high_risk)} high-risk learner(s) detected."
     )
 
-    st.markdown("### High-Risk Learners")
+    section("High-Risk Learners")
 
     st.dataframe(
         high_risk,
-        use_container_width=True
+        width="stretch"
     )
 
     st.markdown(
-        """
-### Recommended Manager Actions
+        "### Recommended Manager Actions"
+    )
 
-- Reduce meeting load for high-risk learners.
-- Allocate dedicated study time.
-- Assign certification mentors.
-- Schedule weekly readiness reviews.
-- Monitor progress through targeted assessments.
-"""
+    insight_cards(
+        [
+            {
+                "title": "Protect focus time",
+                "body": "Reduce meeting load and reserve dedicated certification blocks for high-risk learners.",
+            },
+            {
+                "title": "Add accountability",
+                "body": "Assign mentors and schedule weekly readiness reviews until risk drops.",
+            },
+            {
+                "title": "Use targeted checks",
+                "body": "Monitor progress with focused assessments tied to the learner's weakest skills.",
+            },
+        ]
     )
 
 else:
@@ -266,7 +307,7 @@ else:
 # Certification Forecast
 # --------------------------------------------------
 
-st.markdown("### 📈 Certification Forecast")
+section("Certification Forecast")
 
 expected_pass_rate = (
     len(df[df["Readiness"] >= 60])
@@ -281,7 +322,7 @@ st.info(
 # Executive Summary
 # --------------------------------------------------
 
-st.markdown("### 📋 Executive Summary")
+section("Executive Summary")
 
 st.markdown(
     f"""

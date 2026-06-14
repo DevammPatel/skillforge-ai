@@ -1,7 +1,14 @@
 import streamlit as st
 import pandas as pd
 import plotly.express as px
-import random
+from frontend.ui import (
+    apply_theme,
+    configure_chart,
+    hero,
+    insight_cards,
+    section,
+    stat_grid,
+)
 
 st.set_page_config(
     page_title="Platform Analytics",
@@ -9,51 +16,59 @@ st.set_page_config(
     layout="wide"
 )
 
-st.title("📈 Platform Analytics")
+apply_theme()
 
-st.markdown("""
-Operational visibility into SkillForge AI's multi-agent platform.
-""")
-
-st.divider()
+hero(
+    "Operations view",
+    "Platform Analytics",
+    "Track workflow volume, agent health, response times, and readiness trends.",
+    pills=[
+        ("Health", "stable"),
+        ("Readiness", "78%"),
+        ("Failures", "0"),
+    ],
+)
 
 # =====================================================
 # PLATFORM KPIs
 # =====================================================
 
-col1, col2, col3, col4 = st.columns(4)
+section("Platform Snapshot", "Workflow throughput and current readiness posture")
 
-with col1:
-    st.metric(
-        "Learners Processed",
-        "245"
-    )
-
-with col2:
-    st.metric(
-        "Learning Plans Generated",
-        "198"
-    )
-
-with col3:
-    st.metric(
-        "Assessments Generated",
-        "612"
-    )
-
-with col4:
-    st.metric(
-        "Average Readiness",
-        "78%"
-    )
-
-st.divider()
+stat_grid(
+    [
+        {
+            "label": "Learners Processed",
+            "value": "245",
+            "caption": "Profiles evaluated by the workflow",
+            "tone": "blue",
+        },
+        {
+            "label": "Plans Generated",
+            "value": "198",
+            "caption": "Adaptive study plans created",
+            "tone": "teal",
+        },
+        {
+            "label": "Assessments",
+            "value": "612",
+            "caption": "Questions and criteria generated",
+            "tone": "amber",
+        },
+        {
+            "label": "Avg Readiness",
+            "value": "78%",
+            "caption": "Current platform readiness average",
+            "tone": "green",
+        },
+    ]
+)
 
 # =====================================================
 # AGENT HEALTH
 # =====================================================
 
-st.header("🤖 Agent Health")
+section("Agent Health", "Current status and average response time")
 
 health_df = pd.DataFrame(
     {
@@ -83,16 +98,31 @@ health_df = pd.DataFrame(
 
 st.dataframe(
     health_df,
-    use_container_width=True
+    width="stretch"
 )
 
-st.divider()
+insight_cards(
+    [
+        {
+            "title": "Fastest agent",
+            "body": "Study Planner Agent is currently the quickest responder at 1.1 seconds.",
+        },
+        {
+            "title": "Largest workload",
+            "body": "Assessment Agent takes longest because it generates questions and evaluation criteria.",
+        },
+        {
+            "title": "System state",
+            "body": "All specialized agents are healthy and available for orchestration.",
+        },
+    ]
+)
 
 # =====================================================
 # RESPONSE TIME CHART
 # =====================================================
 
-st.header("⚡ Agent Response Times")
+section("Agent Response Times")
 
 fig = px.bar(
     health_df,
@@ -102,17 +132,15 @@ fig = px.bar(
 )
 
 st.plotly_chart(
-    fig,
-    use_container_width=True
+    configure_chart(fig, height=380),
+    width="stretch"
 )
-
-st.divider()
 
 # =====================================================
 # PLATFORM LOAD
 # =====================================================
 
-st.header("📊 Daily Workflow Volume")
+section("Daily Workflow Volume")
 
 volume_df = pd.DataFrame(
     {
@@ -146,17 +174,15 @@ fig2 = px.line(
 )
 
 st.plotly_chart(
-    fig2,
-    use_container_width=True
+    configure_chart(fig2, height=360),
+    width="stretch"
 )
-
-st.divider()
 
 # =====================================================
 # PLATFORM INSIGHTS
 # =====================================================
 
-st.header("🧠 Platform Insights")
+section("Platform Insights")
 
 st.success("""
 All agents are operational.
