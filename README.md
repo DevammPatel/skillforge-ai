@@ -1,325 +1,180 @@
-# 🚀 SkillForge AI
+# SkillForge AI
 
-### Enterprise Certification Intelligence Platform powered by Azure AI Foundry
+Enterprise certification intelligence powered by Azure AI Foundry, Azure OpenAI, and a coordinated multi-agent workflow.
 
-SkillForge AI is a multi-agent enterprise certification intelligence platform designed to improve workforce certification readiness through intelligent planning, adaptive learning, assessment generation, and workforce-level insights.
+SkillForge AI helps employees and managers turn certification goals into readiness scores, learning paths, adaptive study plans, generated assessments, and workforce-level insights. The app now includes a polished multi-page Streamlit interface with shared visual styling, dashboard cards, tuned Plotly charts, and traceable agent output.
 
-Built for the **Microsoft Agents League Hackathon**, SkillForge AI leverages **Azure AI Foundry**, **Azure OpenAI**, and a collaborative **multi-agent architecture** to transform how organizations prepare employees for professional certifications.
+## What Changed
 
----
+- Added a shared Streamlit UI layer in `frontend/ui.py` for theming, hero sections, section headers, agent lists, and Plotly defaults.
+- Polished the learner planner in `frontend/app.py` with a stronger product layout, styled sidebar workflow, KPI row, readiness gauge, and cleaner output sections.
+- Refined manager and analytics dashboards with consistent cards, chart colors, table framing, and executive sections.
+- Updated architecture and execution trace pages so the whole Streamlit experience feels cohesive.
+- Refreshed this README to match the current project structure and run flow.
 
-# 🎯 Problem Statement
+## Core Features
 
-Organizations invest heavily in employee certifications, yet many learners struggle due to:
+- Learner readiness scoring based on role, certification target, meeting load, and focus capacity.
+- Knowledge-grounded learning path generation for Azure certification goals.
+- Workload-aware study plan creation.
+- Work-rhythm engagement plan for reminder cadence and escalation rules.
+- AI-generated practice assessment content and readiness criteria.
+- Manager dashboard for team readiness, risk distribution, pass-rate forecasting, and recommended actions.
+- Platform analytics for agent health, workflow volume, and response-time visibility.
+- Execution trace page showing each agent handoff and final output.
 
-* Heavy meeting schedules
-* Lack of personalized study plans
-* Poor visibility into readiness levels
-* Static learning recommendations
-* Limited manager insights
+## Microsoft IQ Alignment
 
-Existing learning systems often provide generic recommendations and fail to adapt to individual workloads and organizational constraints.
+This project targets the Microsoft Agents League Reasoning Agents track and uses synthetic enterprise learning data only.
 
----
+- **Foundry IQ pattern:** `knowledge_base/*.md` acts as the approved knowledge layer for learning-path and assessment generation. The prompts require grounded answers and source citations from the synthetic certification guide, workload report, and team report. When Azure credentials are available, Azure OpenAI is used for generation; if not, deterministic grounded demo responses keep the app runnable for judges.
+- **Work IQ pattern:** `data/workload.csv` provides synthetic work signals such as meeting hours, focus hours, and preferred learning slot. These signals influence readiness scoring and workload-aware study planning.
+- **Fabric IQ pattern:** `data/certifications.json` represents a small semantic model of certifications, skills, and recommended study hours. The manager dashboard and planning flow use this role/certification structure for decision support.
 
-# 💡 Solution
+All learner IDs, work signals, certification outcomes, and knowledge documents are fabricated for demonstration. No customer data, employee names, email addresses, PII, credentials, or confidential records are included.
 
-SkillForge AI uses multiple specialized AI agents that collaborate to:
+## Application Pages
 
-* Analyze learner readiness
-* Curate learning resources
-* Generate adaptive study plans
-* Create certification assessments
-* Provide workforce-level manager insights
+| Page | File | Purpose |
+| --- | --- | --- |
+| Learner Planner | `frontend/app.py` | Runs the full multi-agent workflow for an individual learner. |
+| Manager Dashboard | `frontend/pages/manager_dashboard.py` | Aggregates learner readiness, risk, and workforce recommendations. |
+| Platform Analytics | `frontend/pages/platform_analytics.py` | Shows operational metrics for workflows and agent health. |
+| Execution Trace | `frontend/pages/execution_trace.py` | Displays a live trace of the multi-agent workflow. |
+| Architecture | `frontend/pages/architecture.py` | Explains the system design, agents, and data flow. |
 
-The result is a personalized and data-driven certification readiness platform.
-
----
-
-# 🏗️ Architecture
+## Architecture
 
 ```text
 Employee / Manager
-        │
-        ▼
-
+        |
+        v
+Streamlit Experience
+        |
+        v
 Workflow Orchestrator
-
- ├── Learner Profile Agent
- ├── Learning Curator Agent
- ├── Study Planner Agent
- ├── Assessment Agent
- └── Manager Insights Agent
-
-        │
-
-        ▼
-
- Azure AI Foundry
- Azure OpenAI Models
-
-        │
-
-        ▼
-
- Enterprise Knowledge Sources
-
-        │
-
-        ▼
-
- Employee & Manager Dashboards
+        |
+        +-- Learner Profile Agent
+        +-- Learning Curator Agent
+        +-- Study Planner Agent
+        +-- Engagement Agent
+        +-- Assessment Agent
+        +-- Manager Insights Agent
+        |
+        v
+Azure OpenAI / Azure AI Foundry
+        |
+        v
+Knowledge Base + Learner Data
 ```
 
----
-
-# 🤖 Multi-Agent System
-
-## 1. Learner Profile Agent
-
-Responsibilities:
-
-* Readiness analysis
-* Risk identification
-* Study effort estimation
-
-Outputs:
-
-* Readiness Score
-* Risk Level
-* Recommended Study Hours
-
----
-
-## 2. Learning Curator Agent
-
-Responsibilities:
-
-* Knowledge retrieval
-* Learning path generation
-* Skill gap identification
-
-Outputs:
-
-* Personalized Learning Path
-* Recommended Skills
-* Study Sequence
-
----
-
-## 3. Study Planner Agent
-
-Responsibilities:
-
-* Adaptive schedule generation
-* Workload-aware planning
-* Milestone creation
-
-Outputs:
-
-* Weekly Study Plan
-* Daily Learning Schedule
-* Learning Milestones
-
----
-
-## 4. Assessment Agent
-
-Responsibilities:
-
-* Certification question generation
-* Readiness evaluation
-* Knowledge validation
-
-Outputs:
-
-* MCQs
-* Scenario-Based Questions
-* Assessment Criteria
-
----
-
-## 5. Manager Insights Agent
-
-Responsibilities:
-
-* Workforce intelligence
-* Risk detection
-* Certification forecasting
-
-Outputs:
-
-* Team Readiness Analytics
-* Risk Reports
-* Manager Recommendations
-
----
-
-# ☁️ Azure AI Foundry Integration
-
-SkillForge AI uses Azure AI Foundry for:
-
-* Multi-agent reasoning
-* Azure OpenAI model deployment
-* Enterprise-grade AI orchestration
-* Knowledge-grounded recommendations
-* Assessment generation
-
----
-
-# 📊 Key Features
-
-### Employee Dashboard
-
-* Certification readiness score
-* Personalized learning path
-* Adaptive study plan
-* AI-generated assessments
-* Certification guidance
-
-### Manager Dashboard
-
-* Team readiness monitoring
-* Risk distribution analysis
-* Workforce recommendations
-* Certification forecasting
-* Resource planning insights
-
-### Execution Trace
-
-* Transparent multi-agent workflow
-* Agent-by-agent reasoning visibility
-* Workflow traceability
-
-### Platform Analytics
-
-* Agent health monitoring
-* Platform performance metrics
-* Workflow volume analytics
-* Operational visibility
-
----
-
-# 📈 Business Impact
-
-## For Employees
-
-* Personalized learning journeys
-* Better certification readiness
-* Adaptive study schedules
-
-## For Managers
-
-* Early risk identification
-* Improved workforce planning
-* Better resource allocation
-
-## For Organizations
-
-* Higher certification success rates
-* Reduced training inefficiencies
-* Data-driven workforce development
-
----
-
-# 🛠️ Technology Stack
-
-### AI & Agents
-
-* Azure AI Foundry
-* Azure OpenAI
-* Multi-Agent Architecture
-
-### Backend
-
-* Python
-* Custom Agent Orchestration
-
-### Frontend
-
-* Streamlit
-
-### Data & Analytics
-
-* Pandas
-* Plotly
-
----
-
-# 📂 Project Structure
+## Multi-Agent Workflow
+
+1. Learner Profile Agent analyzes readiness, risk, and recommended study effort.
+2. Learning Curator Agent retrieves knowledge and builds a certification learning path.
+3. Study Planner Agent creates an adaptive schedule using workload constraints.
+4. Engagement Agent recommends reminder cadence and follow-up rules from workload signals.
+5. Assessment Agent generates MCQs, scenario questions, and evaluation criteria.
+6. Manager Insights Agent turns the profile and plan into workforce-level guidance.
+
+The orchestrator in `orchestrator/workflow.py` coordinates these agents and returns a single structured result for the UI.
+
+## Tech Stack
+
+- Python
+- Streamlit
+- Plotly
+- Pandas and NumPy
+- Azure OpenAI
+- Azure AI Agents SDK
+- python-dotenv
+
+## Project Structure
 
 ```text
-SkillForge-AI
-
-├── agents
+SkillForge-AI/
+├── agents/
+│   ├── assessment_agent.py
+│   ├── engagement_agent.py
 │   ├── learner_profile_agent.py
 │   ├── learning_curator_agent.py
-│   ├── study_planner_agent.py
-│   ├── assessment_agent.py
+│   ├── llm_client.py
 │   ├── manager_insights_agent.py
-│   └── llm_client.py
-│
-├── orchestrator
-│   ├── workflow.py
-│   └── demo_trace.py
-│
-├── frontend
+│   └── study_planner_agent.py
+├── data/
+│   ├── certifications.json
+│   ├── learners.csv
+│   └── workload.csv
+├── frontend/
 │   ├── app.py
-│   └── pages
-│       ├── manager_dashboard.py
+│   ├── ui.py
+│   └── pages/
 │       ├── architecture.py
 │       ├── execution_trace.py
+│       ├── manager_dashboard.py
 │       └── platform_analytics.py
-│
-├── data
-│
-├── knowledge_base
-│
-└── requirements.txt
+├── knowledge_base/
+│   ├── certification_guide.md
+│   ├── team_report.md
+│   └── workload_report.md
+├── orchestrator/
+│   ├── demo_trace.py
+│   └── workflow.py
+├── config.py
+├── requirements.txt
+└── run_workflow.py
 ```
 
----
+## Setup
 
-# 🚀 Running the Application
+Create and activate a virtual environment:
 
-## Install Dependencies
+```bash
+python -m venv .venv
+source .venv/bin/activate
+```
+
+Install dependencies:
 
 ```bash
 pip install -r requirements.txt
 ```
 
-## Configure Environment Variables
-
-Create a `.env` file:
+Create a `.env` file in the project root:
 
 ```env
 AZURE_OPENAI_ENDPOINT=your_endpoint
 AZURE_OPENAI_API_KEY=your_api_key
-AZURE_OPENAI_DEPLOYMENT_NAME=your_deployment
+AZURE_OPENAI_DEPLOYMENT_NAME=your_deployment_name
+AZURE_AI_PROJECT_ENDPOINT=your_project_endpoint_optional
+AZURE_SEARCH_CONNECTION_NAME=your_search_connection_optional
 ```
 
-## Launch Streamlit
+The app can still run in demo mode without these variables. In that case, Azure calls fall back to deterministic responses grounded in the synthetic local knowledge base.
+
+Run the Streamlit app:
 
 ```bash
 streamlit run frontend/app.py
 ```
 
----
+Open the local Streamlit URL and use the sidebar to generate a learner plan. Streamlit will expose the additional pages from the `frontend/pages` directory.
 
-# 🎥 Demo Workflow
+## CLI Demo
 
-1. Enter employee profile details.
-2. Generate certification readiness analysis.
-3. Review personalized learning path.
-4. Explore adaptive study plan.
-5. Generate certification assessment.
-6. Analyze manager insights.
-7. Monitor workforce readiness through dashboards.
+You can also run the workflow from the terminal:
 
----
+```bash
+python run_workflow.py
+```
 
-# 🏆 Microsoft Agents League Hackathon
+## Data Sources
 
-SkillForge AI demonstrates how multiple specialized AI agents can collaborate through Azure AI Foundry to deliver enterprise-grade certification intelligence, workforce analytics, and adaptive learning experiences.
+- `data/learners.csv` drives the manager dashboard.
+- `data/workload.csv` contains workload context.
+- `data/certifications.json` stores certification metadata.
+- `knowledge_base/*.md` grounds learning path and assessment generation.
 
-Built with ❤️ for the Microsoft Agents League Hackathon.
+## Hackathon Context
+
+SkillForge AI was built for the Microsoft Agents League Hackathon to demonstrate collaborative AI agents for enterprise learning, certification readiness, and workforce planning.
