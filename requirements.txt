@@ -1,6 +1,6 @@
 openai
 azure-identity
-azure-ai-projects
+azure-ai-agents
 python-dotenv
 pandas
 numpy
